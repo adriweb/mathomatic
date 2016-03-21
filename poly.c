@@ -366,7 +366,7 @@ int		do_repeat;	/* factor repeated factors flag */
 		}
 #endif
 		simp_loop(tlhs, &n_tlhs);
-		if ((n_tlhs + 2) > min(DIVISOR_SIZE, n_tokens))
+		if ((n_tlhs + 2) > min(n_tokens, DIVISOR_SIZE))
 			break;
 		for (i = 0; i < n_tlhs; i++)
 			tlhs[i].level++;

@@ -64,7 +64,7 @@ int		*np;		/* pointer to length of equation side */
 	org_recurse(equation, np, 0, 1, NULL);
 }
 
-static inline void
+static /*inline*/ void
 org_up_level(bp, ep, level, invert)
 token_type	*bp, *ep;
 int		level, invert;

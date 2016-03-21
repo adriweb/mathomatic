@@ -23,10 +23,6 @@ George Gesslein II, P.O. Box 224, Lansing, NY  14882-0224  USA.
  */
 
 #include "includes.h"
-#if	UNIX || CYGWIN
-#include <sys/ioctl.h>
-#include <termios.h>
-#endif
 
 /*
  * Display the main Mathomatic startup message.
@@ -850,7 +846,8 @@ int		*np;		/* pointer to the returned parsed expression length */
 	char	*cp;
 
 #if	LIBRARY
-	snprintf(buf, sizeof(buf), "#%+d", pull_number);
+	//snprintf(buf, sizeof(buf), "#%+d", pull_number);
+	sprintf(buf, "#%+d", pull_number);
 	pull_number++;
 	cp = parse_expr(equation, np, buf, true);
 	if (extra_characters(cp))
@@ -1576,6 +1573,8 @@ load_rc(return_true_if_no_file, ofp)
 int	return_true_if_no_file;
 FILE	*ofp;	/* if non-NULL, display each line as read in to this file */
 {
+    return 0; /* false */
+    /*
 	FILE	*fp = NULL;
 	char	buf[MAX_CMD_LEN];
 	char	*cp;
@@ -1619,6 +1618,7 @@ FILE	*ofp;	/* if non-NULL, display each line as read in to this file */
 		perror(rc_file);
 	}
 	return rv;
+    */
 }
 
 #if	0	/* not currently used */

@@ -208,39 +208,8 @@ int
 version_cmd(cp)
 char	*cp;	/* the command-line argument */
 {
-	int	rv = true;		/* return value */
-	int	status_flag = false;
-
-	if (strncasecmp(cp, "status", 4) == 0) {
-		status_flag = true;
-		cp = skip_param(cp);
-	}
-	if (extra_characters(cp))	/* Make sure nothing else is on the command-line. */
-		return false;
-#if	LIBRARY
-	free_result_str();
-	result_str = strdup(VERSION);
-#endif
-	if (status_flag) {
-		rv = version_report();
-	} else {
-#if	!SILENT || !LIBRARY
-		fprintf(gfp, _("Mathomatic version %s\n"), VERSION);
-#endif
-	}
-
-	if (status_flag) {
-		debug_string(0, "\nMathomatic is GNU LGPL version 2.1 licensed software,\n"
-				"meaning it is free software that comes with no warranty.\n"
-				"Type \"help license\" for the copyright and license.");
-
-		EP(_("\nFor all new stuff, visit the Mathomatic website: www.mathomatic.org"));
-	}
-#if	LIBRARY
-	return(rv && result_str != NULL);
-#else
-	return rv;
-#endif
+    // Adriweb: disabled function here
+    return true;
 }
 
 /*
@@ -4471,89 +4440,8 @@ int
 read_file(cp)
 char	*cp;
 {
-	int	rv;
-	FILE	*fp;
-	char	buf[MAX_CMD_LEN];
-#if	SHELL_OUT
-	char	cl[MAX_CMD_LEN];
-	int	ev;	/* exit value */
-	char	*lister;
-#endif
-
-	if (*cp == '\0') {
-#if	SHELL_OUT
-#if	MINGW
-		lister = "dir /W/P";
-#else
-		lister = "ls -C";
-#endif
-		if (gfp && gfp_filename && gfp_filename[0]) {
-			if (snprintf(cl, sizeof(cl), "%s >%s%s", lister, gfp_append_flag ? ">" : "", gfp_filename) >= sizeof(cl)) {
-				error(_("Command-line too long."));
-				return false;
-			}
-			clean_up();	/* end any redirection */
-		} else {
-			if (snprintf(cl, sizeof(cl), "%s", lister) >= sizeof(cl)) {
-				error(_("Command-line too long."));
-				return false;
-			}
-		}
-#if	!MINGW
-		printf(_("Listing contents of "));
-		output_current_directory(stdout);
-		printf("\n");
-#endif
-		if ((ev = shell_out(cl))) {
-			error(_("Error executing directory lister."));
-			printf(_("Decimal exit value = %d, shell command-line = %s\n"), ev, cl);
-			return false;
-		}
-		return true;
-#else
-		error(_("No file name specified."));
-		return false;
-#endif
-	}
-	if (snprintf(buf, sizeof(buf), "%s.in", cp) >= sizeof(buf)) {
-		error(_("File name too long."));
-		return false;
-	}
-	fp = fopen(buf, "r");
-	if (fp == NULL) {
-		buf[strlen(cp)] = '\0';
-		fp = fopen(buf, "r");
-		if (fp == NULL) {
-			if (chdir(buf)) {
-				error(_("Can't open requested file to read or change directory to."));
-				return false;
-			} else {
-				printf(_("Current working directory changed to "));
-				return output_current_directory(stdout);
-			}
-		}
-	}
-	rv = read_sub(fp, buf);
-	show_usage = false;
-	if (fclose(fp)) {
-		perror(buf);
-		rv = 1;
-	}
-	if (rv == 100)
-		return(true);
-#if	!SILENT
-	if (!quiet_mode) {
-		if (rv) {
-			if (!demo_mode) {
-				printf(_("Reading of script file \"%s\" aborted due to failure return status\n"), buf);
-				printf(_("of a command or expression parsing, or some other error listed above.\n"));
-			}
-		} else if (debug_level >= 0) {
-			printf(_("Successfully finished reading script file \"%s\".\n"), buf);
-		}
-	}
-#endif
-	return(!rv);
+	// No need for the CE
+    return false;
 }
 
 /*
@@ -4566,43 +4454,8 @@ read_sub(fp, filename)
 FILE	*fp;		/* open Mathomatic input file */
 char	*filename;	/* filename of fp */
 {
-	int	rv;
-	jmp_buf	save_save;
-	char	*cp;
-	int	something_there = false;
-
-	if (fp == NULL) {
-		return -1;
-	}
-	blt(save_save, jmp_save, sizeof(jmp_save));
-	if ((rv = setjmp(jmp_save)) != 0) {	/* trap errors */
-		clean_up();
-		if (rv == 14) {
-			error(_("Expression too large."));
-		}
-		previous_return_value = 0;
-	} else {
-		while ((cp = fgets((char *) tlhs, n_tokens * sizeof(token_type), fp)) != NULL) {
-			if (*cp) {
-				something_there = true;
-			}
-			if (!display_process(cp)) {
-				longjmp(jmp_save, 3);	/* jump to the above error trap */
-			}
-		}
-		if (!something_there) {
-			if (chdir(filename)) {
-				error(_("Empty file (no script to read)."));
-				rv = 1;
-			} else {
-				printf(_("Current directory changed to "));
-				output_current_directory(stdout);
-				rv = 100;
-			}
-		}
-	}
-	blt(jmp_save, save_save, sizeof(jmp_save));
-	return rv;
+    // No need for the CE
+    return false;
 }
 #endif
 
@@ -4722,68 +4575,7 @@ int
 save_cmd(cp)
 char	*cp;
 {
-	FILE	*fp;
-	int	rv, space_flag = false, error_flag;
-	char	*cp1;
-
-	if (security_level >= 2) {
-		show_usage = false;
-		error(_("Command disabled by security level."));
-		return false;
-	}
-	clean_up();	/* end any redirection */
-	if (*cp == '\0') {
-		error(_("No file name specified; nothing was saved."));
-		return false;
-	}
-	for (cp1 = cp; *cp1; cp1++) {
-		if (isspace(*cp1)) {
-			space_flag = true;
-		}
-	}
-#if	!SILENT
-	if (access(cp, F_OK) == 0) {
-		if (access(cp, W_OK)) {
-			perror(cp);
-			error(_("Specified save file is not writable; choose a different file name."));
-			return false;
-		}
-		snprintf(prompt_str, sizeof(prompt_str), _("File \"%s\" exists, overwrite (y/n)? "), cp);
-		if (!get_yes_no()) {
-			error(_("File not overwritten; nothing was saved."));
-			return false;
-		}
-	} else if (space_flag) {
-		snprintf(prompt_str, sizeof(prompt_str), _("File name \"%s\" contains space characters, create anyways (y/n)? "), cp);
-		if (!get_yes_no()) {
-			error(_("Save command aborted; nothing was saved."));
-			return false;
-		}
-	}
-#endif
-	fp = fopen(cp, "w");
-	if (fp == NULL) {
-		perror(cp);
-		error(_("Cannot create specified save file; nothing was saved."));
-		return false;
-	}
-	gfp = fp;
-	high_prec = true;
-	rv = list_cmd("all");
-	high_prec = false;
-	gfp = default_out;
-	error_flag = ferror(fp);
-	if (fclose(fp) || error_flag) {
-		rv = false;
-		perror(cp);
-	}
-	if (rv) {
-#if	!SILENT
-		printf(_("All expressions saved in file \"%s\".\n"), cp);
-#endif
-	} else {
-		error(_("Error encountered while saving expressions."));
-	}
-	return rv;
+    // No need for the CE
+    return false;
 }
 #endif

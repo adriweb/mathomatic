@@ -22,11 +22,11 @@ George Gesslein II, P.O. Box 224, Lansing, NY  14882-0224  USA.
  
  */
 
+
 #ifndef	DBL_DIG
 #error "DBL_DIG not defined!"
 #elif DBL_DIG != 15
-#warning "DBL_DIG (the number of digits precision of doubles) is not 15."
-#warning "This might be a problem."
+#warning DBL_DIG (the number of digits precision of doubles) is not 15. This might be a problem.
 #endif
 
 #if	sun
@@ -38,7 +38,7 @@ George Gesslein II, P.O. Box 224, Lansing, NY  14882-0224  USA.
 #endif
 
 #ifndef PATH_MAX					/* make sure the maximum file pathname length is set */
-#define PATH_MAX	4096
+#define PATH_MAX	50
 #endif
 
 #define	MAX_K_INTEGER	1.0e15		/* maximum safely representable floating point integer, 15 digits for doubles */
@@ -52,8 +52,8 @@ George Gesslein II, P.O. Box 224, Lansing, NY  14882-0224  USA.
 					/* Don't bother marking debug and fatal bug error strings. */
 #endif
 
-#define	STANDARD_SCREEN_COLUMNS	80			/* default number of columns of characters on the screen */
-#define	STANDARD_SCREEN_ROWS	24			/* default number of lines on the screen */
+#define	STANDARD_SCREEN_COLUMNS	26			/* default number of columns of characters on the screen */
+#define	STANDARD_SCREEN_ROWS	10			/* default number of lines on the screen */
 #define	TEXT_ROWS	STANDARD_SCREEN_ROWS		/* number of lines per page in the symbolic math library */
 #define	TEXT_COLUMNS	STANDARD_SCREEN_COLUMNS		/* default number of columns per page in the symbolic math library */
 
@@ -115,7 +115,7 @@ typedef	struct {		/* storage structure for each token in an expression */
  * This affects maximum memory usage.
  */
 #ifndef	N_EQUATIONS
-#define	N_EQUATIONS	200
+#define	N_EQUATIONS	50
 #endif
 
 /*
@@ -128,7 +128,8 @@ typedef	struct {		/* storage structure for each token in an expression */
  */
 #ifndef	DEFAULT_N_TOKENS
 #if	HANDHELD
-#define	DEFAULT_N_TOKENS	10000
+/* This was 10000. For the CE, we have to set less than that... */
+#define	DEFAULT_N_TOKENS	200
 #else
 #define	DEFAULT_N_TOKENS	60000
 #endif
@@ -143,8 +144,8 @@ typedef	struct {		/* storage structure for each token in an expression */
  * All Mathomatic variables are referenced by the value in a C long int variable.
  * The actual name string is stored separately.
  */
-#define	MAX_VAR_NAMES	8000			/* maximum number of variable names, keep this under (VAR_MASK - VAR_OFFSET) */
-#define	MAX_VAR_LEN	100			/* maximum number of characters in variable names */
+#define	MAX_VAR_NAMES	100			/* maximum number of variable names, keep this under (VAR_MASK - VAR_OFFSET) */
+#define	MAX_VAR_LEN	20			/* maximum number of characters in variable names */
 
 #define	MAX_VARS	min(DEFAULT_N_TOKENS / 4, 1000)	/* maximum number of unique variables handled in each equation */
 
@@ -171,12 +172,12 @@ enum language_list {
 /* Debugging macros: */
 #if	SILENT
 #define	list_esdebug(level, en)		{ ; }	/* Display an equation space. */
-#define	list_tdebug(level)		{ ; }	/* Display the temporary equation (e.g.: when solving). */
+#define	list_tdebug(level)		    { ; }	/* Display the temporary equation (e.g.: when solving). */
 #define	side_debug(level, p1, n1)	{ ; }	/* Display any expression. */
 #define debug_string(level, str)	{ ; }	/* Display any ASCII string. */
 #else
 #define	list_esdebug(level, en)		list_debug(level, lhs[en], n_lhs[en], rhs[en], n_rhs[en])
-#define list_tdebug(level)		list_debug(level, tlhs, n_tlhs, trhs, n_trhs)
+#define list_tdebug(level)		    list_debug(level, tlhs, n_tlhs, trhs, n_trhs)
 #define	side_debug(level, p1, n1)	list_debug(level, p1, n1, NULL, 0)
 #define debug_string(level, str)	{ if (debug_level >= (level)) fprintf(gfp, "%s\n", str); }
 #endif

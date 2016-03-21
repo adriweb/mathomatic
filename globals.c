@@ -107,27 +107,13 @@ int		html_flag;			/* 1 for HTML mode on all standard output; 2 for HTML mode on 
 
 /* double precision floating point epsilon constants for number comparisons for equivalency */
 double		small_epsilon	= 0.000000000000005;	/* for ignoring small, floating point round-off errors */
-double		epsilon		= 0.00000000000005;	/* for ignoring larger, accumulated round-off errors */
+double		epsilon		    = 0.00000000000005;	/* for ignoring larger, accumulated round-off errors */
 
 /* string variables */
 char		*prog_name = "mathomatic";	/* name of this program */
 char		*var_names[MAX_VAR_NAMES];	/* index for storage of variable name strings */
 char		var_str[MAX_VAR_LEN+80];	/* temp storage for listing a variable name */
 char		prompt_str[MAX_PROMPT_LEN];	/* temp storage for the prompt string */
-#if	!SECURE
-char		rc_file[MAX_CMD_LEN];		/* pathname for the set options startup file */
-#endif
-
-#if	CYGWIN || MINGW
-char		*dir_path;			/* directory path to the executable */
-#endif
-#if	READLINE || EDITLINE
-char		*last_history_string;		/* To prevent repeated, identical entries.  Must not point to temporary string. */
-#endif
-#if	READLINE
-char		*history_filename;
-char		history_filename_storage[MAX_CMD_LEN];
-#endif
 
 /* The following are for integer factoring (filled by factor_one()): */
 double		unique[64];		/* storage for the unique prime factors */
